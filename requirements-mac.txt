@@ -1,0 +1,14 @@
+# === Deep Learning Framework ===
+tensorflow
+# === Manipulação de Dados ===
+numpy>=1.21.0
+
+# === Visualização (Mapas de Atenção) ===
+# Essenciais para fazer o script plot_attention_map.py funcionar
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# === Ambiente de Desenvolvimento ===
+# Caso queiram usar notebooks para os testes de 1 vs 50 épocas
+jupyter>=1.0.0
+notebook>=6.4.0
