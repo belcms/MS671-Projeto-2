@@ -1,3 +1,7 @@
+import numpy as np
+import string_to_int
+import matplotlib.pyplot as plt
+
 def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_s = 128, num = 7):
     """
     Plot the attention map.
