@@ -3,6 +3,7 @@ import tensorflow as tf
 from keras.layers import Input, Bidirectional, LSTM, Embedding
 from keras.layers import RepeatVector, Concatenate, Dense, Activation, Dot
 import pickle
+import pandas as pd
 
 
 #lê arquivos em data
@@ -12,12 +13,15 @@ caminho_machine_vocab = "data/machine_vocab.pkl"
 
 with open(caminho_dataset, "rb") as f:
     dataset = pickle.load(f)
+# print(dataset[:10])
 
 with open(caminho_human_vocab, "rb") as f:
     human_vocab = pickle.load(f)
+# print(human_vocab)
 
 with open(caminho_machine_vocab, "rb") as f:
     machine_vocab = pickle.load(f)
+# print(human_vocab)
 
 human_vocab_size = len(human_vocab) 
 
