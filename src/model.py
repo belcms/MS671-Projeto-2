@@ -5,10 +5,32 @@ from keras.layers import RepeatVector, Concatenate, Dense, Activation, Dot
 import pickle
 import pandas as pd
 from load_dataset import load_dataset
+from preprocess_data import preprocess_data
 
 
 m = 10000
 dataset, human_vocab, machine_vocab, inv_machine_vocab = load_dataset(m)
+
+Tx = 30 #length da entrada x 
+Ty = 10 #length da saída y
+
+X, Y, Xoh, Yoh = preprocess_data(dataset, human_vocab, machine_vocab, Tx, Ty)
+
+# print("X.shape:", X.shape)
+# print("Y.shape:", Y.shape)
+# print("Xoh.shape:", Xoh.shape)
+# print("Yoh.shape:", Yoh.shape)
+
+
+# index = 0
+# print("Source date:", dataset[index][0])
+# print("Target date:", dataset[index][1])
+# print()
+# print("Source after preprocessing (indices):", X[index])
+# print("Target after preprocessing (indices):", Y[index])
+# print()
+# print("Source after preprocessing (one-hot):", Xoh[index])
+# print("Target after preprocessing (one-hot):", Yoh[index])
 
 human_vocab_size = len(human_vocab) 
 
