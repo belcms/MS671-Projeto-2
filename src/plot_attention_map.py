@@ -1,6 +1,9 @@
 import numpy as np
 import string_to_int
 import matplotlib.pyplot as plt
+from keras.models import load_model, Model
+from keras.utils import to_categorical
+
 
 def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_s = 128, num = 7):
     """
