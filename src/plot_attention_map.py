@@ -1,5 +1,7 @@
 import numpy as np
 import string_to_int
+from int_to_string import int_to_string
+from model import modelf
 import matplotlib.pyplot as plt
 
 def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_s = 128, num = 7):
