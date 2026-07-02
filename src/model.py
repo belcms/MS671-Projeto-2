@@ -127,7 +127,7 @@ outputs = list(Yoh.swapaxes(0,1))
 # model.fit([Xoh, s0, c0], outputs, epochs=100, batch_size=100)
 # model.save_weights("pesos100epocas.weights.h5")
 
-model.load_weights('pesos100epocas.weights.h5')
+model.load_weights('weights/model.h5')
 
 def translate_date(sentence):
     s00 = np.zeros((1, n_s))

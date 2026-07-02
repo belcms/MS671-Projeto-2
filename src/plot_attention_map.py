@@ -45,7 +45,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
         context = modelx.layers[8]([alphas, a])
         # Don't forget to pass: initial_state = [hidden state, cell state] (≈ 1 line)
         s, _, c = modelx.layers[10](context, initial_state = [s, c]) 
-        outputs.append(energies)
+        outputs.append(alphas)
 
     f = Model(inputs=[X, s0, c0], outputs = outputs)
     
@@ -62,9 +62,16 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
         for t_prime in range(Tx):
             attention_map[t][t_prime] = r[t][0, t_prime,0]
 
-    # Normalize attention map
+    input_length = len(text)
+
+    # 1. Normalizar PRIMEIRO (isso garante que o pico real no padding seja o 1.0)
+    print(attention_map[4:10, :input_length])
+    
     row_max = attention_map.max(axis=1)
-    attention_map = attention_map / row_max[:, None]
+    attention_map = attention_map / np.where(row_max == 0, 1, row_max)[:, None]
+
+    # 2. Cortar DEPOIS (agora as linhas finais terão valores próximos a 0.0)
+    attention_map = attention_map[:, :input_length]
 
     prediction = modelx.predict([encoded, s0, c0])
     
@@ -107,7 +114,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     ax.grid()
 
     plt.show()
-
-    f.savefig("attention_map.png", bbox_inches="tight")
     
     return attention_map
+
+    #TESTEE
