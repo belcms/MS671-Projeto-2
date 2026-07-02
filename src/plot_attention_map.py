@@ -1,7 +1,6 @@
 import numpy as np
-import string_to_int
+from string_to_int import string_to_int
 from int_to_string import int_to_string
-from model import modelf
 import matplotlib.pyplot as plt
 from keras.models import load_model, Model
 from keras.utils import to_categorical
@@ -13,7 +12,6 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
   
     """
     attention_map = np.zeros((10, 30))
-    layer = modelx.get_layer('attention_weights')
 
     Ty, Tx = attention_map.shape
     
@@ -32,7 +30,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     s0 = modelx.inputs[1] 
     c0 = modelx.inputs[2] 
     s = s0
-    c = s0
+    c = c0
     
     a = modelx.layers[2](X)  
     outputs = []
@@ -62,7 +60,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
         
     for t in range(Ty):
         for t_prime in range(Tx):
-            attention_map[t][t_prime] = r[t][0, t_prime]
+            attention_map[t][t_prime] = r[t][0, t_prime,0]
 
     # Normalize attention map
     row_max = attention_map.max(axis=1)
@@ -72,7 +70,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     
     predicted_text = []
     for i in range(len(prediction)):
-        predicted_text.append(int(np.argmax(prediction[i], axis=1)))
+        predicted_text.append(int(np.argmax(prediction[i], axis=1)[0]))
         
     predicted_text = list(predicted_text)
     predicted_text = int_to_string(predicted_text, inv_output_vocabulary)
@@ -108,6 +106,8 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     # add grid and legend
     ax.grid()
 
-    #f.show()
+    plt.show()
+
+    f.savefig("attention_map.png", bbox_inches="tight")
     
     return attention_map

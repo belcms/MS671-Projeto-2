@@ -5,12 +5,14 @@ from keras.layers import RepeatVector, Concatenate, Dense, Activation, Dot
 import pickle
 import pandas as pd
 from load_dataset import load_dataset
+from plot_attention_map import plot_attention_map
 from preprocess_data import preprocess_data
 from keras.models import load_model, Model
 from keras.optimizers import Adam
 from string_to_int import string_to_int
 from keras.utils import to_categorical
 from keras.layers import Softmax
+from matplotlib import pyplot as plt
 
 
 
@@ -148,4 +150,8 @@ def translate_date(sentence):
 
 example = "4th of july 2001"
 translate_date(example)
+
+model.summary()
+
+attention_map = plot_attention_map(model, human_vocab, inv_machine_vocab, "Tuesday 09 Oct 1993", num = 7, n_s = 64);
 
