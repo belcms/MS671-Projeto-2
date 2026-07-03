@@ -13,6 +13,10 @@ from string_to_int import string_to_int
 from keras.utils import to_categorical
 from keras.layers import Softmax
 from matplotlib import pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
 
 
 
@@ -29,12 +33,11 @@ repetidor = RepeatVector(Tx)
 concatenador = Concatenate(axis=-1)
 densa_1 = Dense(10, activation="tanh") 
 densa_2 = Dense(1, activation="relu") 
-# ativacao_softmax = Activation("softmax", name='attention_weights')
-ativacao_softmax = Softmax(axis=1, name='attention_weights') #verficar
+ativacao_softmax = Softmax(axis=1, name='attention_weights') 
 calculo_contexto = Dot(axes=1)
 
 
-lstm_units = 32 # number of units for the pre-attention, bi-directional LSTM's hidden state 'a'
+n_a = 32 # number of units for the pre-attention, bi-directional LSTM's hidden state 'a'
 n_s = 64 # number of units for the post-attention LSTM's hidden state "s"
 
 post_activation_LSTM_cell = LSTM(n_s, return_state = True) # Please do not modify this global variable.
@@ -114,7 +117,7 @@ def modelf(Tx, Ty, n_a, n_s, human_vocab_size, machine_vocab_size):
 
     return model
 
-model = modelf(Tx, Ty, lstm_units, n_s, len(human_vocab), len(machine_vocab))
+model = modelf(Tx, Ty, n_a, n_s, len(human_vocab), len(machine_vocab))
 # model.summary()
 
 opt = Adam(learning_rate=0.005, beta_1=0.9, beta_2=0.999, weight_decay=0.01)
@@ -127,7 +130,9 @@ outputs = list(Yoh.swapaxes(0,1))
 # model.fit([Xoh, s0, c0], outputs, epochs=100, batch_size=100)
 # model.save_weights("pesos100epocas.weights.h5")
 
-model.load_weights('weights/model.h5')
+
+# model.load_weights('weights/model.h5')
+model.load_weights('pesos100epocas.weights.h5')
 
 def translate_date(sentence):
     s00 = np.zeros((1, n_s))
@@ -154,4 +159,3 @@ translate_date(example)
 model.summary()
 
 attention_map = plot_attention_map(model, human_vocab, inv_machine_vocab, "Tuesday 09 Oct 1993", num = 7, n_s = 64);
-
