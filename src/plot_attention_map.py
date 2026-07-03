@@ -1,5 +1,6 @@
 import numpy as np
-import string_to_int
+from string_to_int import string_to_int
+from int_to_string import int_to_string
 import matplotlib.pyplot as plt
 from keras.models import load_model, Model
 from keras.utils import to_categorical
@@ -11,7 +12,6 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
   
     """
     attention_map = np.zeros((10, 30))
-    layer = modelx.get_layer('attention_weights')
 
     Ty, Tx = attention_map.shape
     
@@ -30,7 +30,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     s0 = modelx.inputs[1] 
     c0 = modelx.inputs[2] 
     s = s0
-    c = s0
+    c = c0
     
     a = modelx.layers[2](X)  
     outputs = []
@@ -45,7 +45,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
         context = modelx.layers[8]([alphas, a])
         # Don't forget to pass: initial_state = [hidden state, cell state] (≈ 1 line)
         s, _, c = modelx.layers[10](context, initial_state = [s, c]) 
-        outputs.append(energies)
+        outputs.append(alphas)
 
     f = Model(inputs=[X, s0, c0], outputs = outputs)
     
@@ -60,17 +60,24 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
         
     for t in range(Ty):
         for t_prime in range(Tx):
-            attention_map[t][t_prime] = r[t][0, t_prime]
+            attention_map[t][t_prime] = r[t][0, t_prime,0]
 
-    # Normalize attention map
+    input_length = len(text)
+
+    # 1. Normalizar PRIMEIRO (isso garante que o pico real no padding seja o 1.0)
+    print(attention_map[4:10, :input_length])
+
     row_max = attention_map.max(axis=1)
-    attention_map = attention_map / row_max[:, None]
+    attention_map = attention_map / np.where(row_max == 0, 1, row_max)[:, None]
+
+    # 2. Cortar DEPOIS (agora as linhas finais terão valores próximos a 0.0)
+    attention_map = attention_map[:, :input_length]
 
     prediction = modelx.predict([encoded, s0, c0])
     
     predicted_text = []
     for i in range(len(prediction)):
-        predicted_text.append(int(np.argmax(prediction[i], axis=1)))
+        predicted_text.append(int(np.argmax(prediction[i], axis=1)[0]))
         
     predicted_text = list(predicted_text)
     predicted_text = int_to_string(predicted_text, inv_output_vocabulary)
@@ -106,6 +113,8 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     # add grid and legend
     ax.grid()
 
-    #f.show()
+    plt.savefig("attention_map.png", dpi=300, bbox_inches='tight')
     
     return attention_map
+
+    #TESTEE
