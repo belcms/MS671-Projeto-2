@@ -1,6 +1,6 @@
 # === Configurações do Projeto (Deep Learning / Tradução) ===
 # Ignorar pastas de dados locais muito grandes (se houvedatasets/
-*.csv
+# *.csv
 *.json
 
 # === Ficheiros Grandes / Pesos de Modelos ===

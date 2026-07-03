@@ -17,6 +17,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+import pandas as pd
 
 
 
@@ -127,10 +128,13 @@ s0 = np.zeros((m, n_s))
 c0 = np.zeros((m, n_s))
 outputs = list(Yoh.swapaxes(0,1))
 
-# model.fit([Xoh, s0, c0], outputs, epochs=100, batch_size=100)
-# model.save_weights("100epocas.weights.h5")
+# model.fit([Xoh, s0, c0], outputs, epochs=1, batch_size=100)
+# model.save_weights("1epocas.weights.h5")
 
-model.load_weights('pesos100epocas.weights.h5')
+# model.load_weights('50epocas.weights.h5')
+# model.load_weights('weights/model.h5')
+# model.load_weights('1epocas.weights.h5')
+# model.load_weights('pesos100epocas.weights.h5')
 
 def translate_date(sentence):
     s00 = np.zeros((1, n_s))
@@ -151,9 +155,107 @@ def translate_date(sentence):
     print("source:", sentence)
     print("output:", ''.join(output),"\n")
 
-example = "4th of july 2001"
-translate_date(example)
 
-model.summary()
 
-attention_map = plot_attention_map(model, human_vocab, inv_machine_vocab, "Tuesday 09 Oct 1993", num = 7, n_s = 64);
+
+# ==========================================
+# 1. CONFIGURAÇÃO DOS ARQUIVOS
+# ==========================================
+caminho_csv = 'data/test_dataset.csv' 
+coluna_input = 'human_readable'          
+coluna_target = 'machine_readable'       
+
+pesos = {
+    '1 Época': '1epocas.weights.h5',
+    '50 Épocas': '50epocas.weights.h5',
+    'Pré-Treinado': 'pesos100epocas.weights.h5'
+}
+
+df_teste = pd.read_csv(caminho_csv)
+num_amostras = min(1000, len(df_teste))
+df_amostra = df_teste.head(num_amostras)
+
+X_teste = df_amostra[coluna_input].astype(str).tolist()
+Y_teste = df_amostra[coluna_target].astype(str).tolist()
+
+
+def translate_date_adapted(sentence, modelo_atual):
+    """A sua função original, mas retornando a string para cálculo de acurácia"""
+    s00 = np.zeros((1, n_s))
+    c00 = np.zeros((1, n_s))
+    
+    source = string_to_int(sentence, Tx, human_vocab)
+    
+    # Prevenção caso a string seja inválida no dicionário
+    if source is None:
+        return ""
+        
+    source = np.array(list(map(lambda x: to_categorical(x, num_classes=len(human_vocab)), source))).swapaxes(0,1)
+    source = np.swapaxes(source, 0, 1)
+    source = np.expand_dims(source, axis=0)
+    
+    # Usa o modelo passado como argumento
+    prediction = modelo_atual.predict([source, s00, c00], verbose=0)
+    
+    indices_vencedores = [np.argmax(p) for p in prediction]
+    output = [inv_machine_vocab[i] for i in indices_vencedores]
+    
+    # Junta os caracteres e retorna a string gerada
+    resultado_final = ''.join(output).replace('<pad>', '')
+    return resultado_final
+
+def calcular_acuracia_exata(modelo_atual, X_data, Y_data):
+    acertos = 0
+    total = len(X_data)
+    
+    for i in range(total):
+        predicao = translate_date_adapted(X_data[i], modelo_atual)
+        if predicao == Y_data[i]:
+            acertos += 1
+            
+    return (acertos / total) * 100
+
+# ==========================================
+# 3. EXECUÇÃO DO EXPERIMENTO
+# ==========================================
+modelo_avaliacao = modelf(Tx, Ty, n_a, n_s, len(human_vocab), len(machine_vocab))
+
+resultados_acuracia = {}
+exemplos_qualitativos = X_teste[:5] 
+tabela_predicoes = {'Input': exemplos_qualitativos, 'Gabarito': Y_teste[:5]}
+
+print(f"Iniciando avaliação em {num_amostras} exemplos do arquivo CSV...\n")
+
+for nome_modelo, arquivo_peso in pesos.items():
+    print(f"Carregando pesos: {nome_modelo}...")
+    try:
+        modelo_avaliacao.load_weights(arquivo_peso)
+        
+        acc = calcular_acuracia_exata(modelo_avaliacao, X_teste, Y_teste)
+        resultados_acuracia[nome_modelo] = acc
+        print(f"-> Acurácia: {acc:.2f}%\n")
+        
+        preds = [translate_date_adapted(f, modelo_avaliacao) for f in exemplos_qualitativos]
+        tabela_predicoes[nome_modelo] = preds
+        
+    except Exception as e:
+        print(f"Erro ao carregar o modelo {nome_modelo}: {e}")
+
+# ==========================================
+# 4. EXIBIÇÃO DOS RESULTADOS
+# ==========================================
+print("=== COMPARAÇÃO QUALITATIVA (Primeiros 5 exemplos) ===")
+df_qualitativo = pd.DataFrame(tabela_predicoes)
+print(df_qualitativo.to_string(index=False))
+
+if resultados_acuracia:
+    plt.figure(figsize=(8, 5))
+    sns.barplot(x=list(resultados_acuracia.keys()), y=list(resultados_acuracia.values()), palette='magma')
+    plt.title(f'Acurácia de Tradução Exata')
+    plt.ylabel('Acurácia (%)')
+    plt.ylim(0, 105)
+    
+    for i, v in enumerate(resultados_acuracia.values()):
+        plt.text(i, v + 2, f"{v:.1f}%", ha='center', fontweight='bold')
+        
+    plt.show()
