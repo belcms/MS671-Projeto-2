@@ -66,7 +66,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
 
     # 1. Normalizar PRIMEIRO (isso garante que o pico real no padding seja o 1.0)
     print(attention_map[4:10, :input_length])
-    
+
     row_max = attention_map.max(axis=1)
     attention_map = attention_map / np.where(row_max == 0, 1, row_max)[:, None]
 
@@ -113,7 +113,7 @@ def plot_attention_map(modelx, input_vocabulary, inv_output_vocabulary, text, n_
     # add grid and legend
     ax.grid()
 
-    plt.show()
+    plt.savefig("attention_map.png", dpi=300, bbox_inches='tight')
     
     return attention_map
 

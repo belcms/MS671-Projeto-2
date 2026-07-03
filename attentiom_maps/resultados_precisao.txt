@@ -1,0 +1,13 @@
+Resultados da Avaliação no test_dataset.csv (500 amostras)
+============================================================
+
+Modelo (n_a= 16, n_s= 32) | Acc Char: 0.9970 | Acc Seq (Frase Completa): 0.9700
+Modelo (n_a= 32, n_s= 64) | Acc Char: 0.9978 | Acc Seq (Frase Completa): 0.9820
+Modelo (n_a= 64, n_s=128) | Acc Char: 0.9988 | Acc Seq (Frase Completa): 0.9880
+Modelo (n_a=  8, n_s= 16) | Acc Char: 0.9928 | Acc Seq (Frase Completa): 0.9280
+Modelo (n_a= 16, n_s=  8) | Acc Char: 0.9022 | Acc Seq (Frase Completa): 0.3180
+Modelo (n_a= 32, n_s= 16) | Acc Char: 0.9988 | Acc Seq (Frase Completa): 0.9880
+Modelo (n_a= 16, n_s= 16) | Acc Char: 0.9920 | Acc Seq (Frase Completa): 0.9260
+Modelo (n_a=  8, n_s=  8) | Acc Char: 0.9168 | Acc Seq (Frase Completa): 0.3980
+Modelo (n_a=  4, n_s=  4) | Acc Char: 0.7018 | Acc Seq (Frase Completa): 0.0080
+Modelo (n_a=128, n_s=256) | Acc Char: 0.9986 | Acc Seq (Frase Completa): 0.9860
